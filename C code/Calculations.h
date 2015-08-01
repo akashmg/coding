@@ -9,11 +9,7 @@
 #define CALCULATIONS_H
 
 /********* I N C L U D E S ***********/ 
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdbool.h>
+ #include <stdint.h>
 
 /********* T Y P E D E F S ***********/ 
 
