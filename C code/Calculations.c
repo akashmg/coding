@@ -8,8 +8,12 @@
 /********* I N C L U D E S ***********/ 
 #include "Calculations.h"
 #include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 /********* D E F I N E S ***********/ 
+ #define TURN_TABLE_DECK_OVER_FOR_RESHUFFLE 0   // Set to 1 if you turn the deck over when you pick it up from the table.
+ #define START_CARDS_SHUFFLE_IN_REVERSE     0   // Set to 1 if the card order should be reversed for first shuffle
 
 /********* T Y P E D E F S ***********/ 
 typedef struct cardList {
@@ -45,6 +49,7 @@ uint16_t calcNumIterations(uint16_t numCards)
 {
     createCardList(numCards);
     beginCalculation();
+    deleteCardList(head);
     return CalculationVars.result;
 }
 
@@ -69,8 +74,9 @@ static void createCardList(uint16_t numCards)
         newCard->next = head;
         head = newCard;
     }
-
-    head = invertList(head);
+#if (START_CARDS_SHUFFLE_IN_REVERSE)
+    head = invertList(head); // Uncomment if starting order should be ascending
+#endif
 
     CardList_S *temp = head;
     // Find last element of list (before the NULL element)
@@ -80,6 +86,7 @@ static void createCardList(uint16_t numCards)
         temp->origNext = temp->next;    // update original list order
         temp = temp->next;
     }
+
 }
 
 
@@ -117,12 +124,14 @@ static void beginCalculation(void)
     uint16_t loopCounter = 0U;
     while (!backToSquareOne)
     {
+        loopCounter++;
         iterateShuffle();
 
         if (compareOriginal())
         {
             backToSquareOne = true;
         }
+
     }
 
     CalculationVars.result = loopCounter;
@@ -141,6 +150,7 @@ static void iterateShuffle(void)
     {
         if (removeCard || (head == tail))
         {
+            printf("%d\t",head->value);
             newTableCard = cardPop();
             newTableCard->next = tableHead;
             tableHead = newTableCard;
@@ -148,13 +158,34 @@ static void iterateShuffle(void)
         }
         else
         {
-            cardPopAndAppend();
+            if (head != tail)       // If it is the last card then just add it to the table pile.
+            {
+                cardPopAndAppend();
+            }
             removeCard = true;
         }
     }
 
-    head = invertList(tableHead);
-
+#if (TURN_TABLE_DECK_OVER_FOR_RESHUFFLE)
+    head = invertList(tableHead); 
+#else
+    head = tableHead;
+#endif
+    // CardList_S * temp = head;
+    // printf("\n");
+    // while(temp != NULL)
+    // {
+    //     printf("%d\t", temp->value);
+    //     temp = temp->next;
+    // }
+    CardList_S *temp = head;
+    // Find last element of list (before the NULL element)
+    while (temp != NULL)
+    {
+        tail = temp;
+        temp = temp->next;
+    }
+ 
 }
 
 /**
@@ -201,6 +232,15 @@ static void cardPopAndAppend(void)
     tail->next = temp;          // Append popped element to tail
     tail = temp;                // Update tail
 
-    temp = head;
+}
 
+static void deleteCardList(CardList_S * listHead)
+{
+    CardList_S * temp;
+    while (head != NULL)
+    {
+        temp = head;
+        head = head->next;
+        free(temp);
+    }
 }
