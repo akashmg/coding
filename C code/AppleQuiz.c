@@ -61,6 +61,7 @@ static void progIntro(void)
     printf("Once all cards are on the table, the same process is repeated until the original sequence of cards is returned.\n");
     printf("The goal of this code is to count the number of repetitions needed to complete this cycle.\n");
     printf("The user gets to input the number of cards present in the deck.\n");
+    printf("It is advisable to limit the number to less than 1000 to ensure a reasonable processing time.");
 
 }
 
@@ -79,7 +80,7 @@ static uint16_t getUserInput(void)
     while (!inputSuccess)
     {
         // Prompt user for input
-        printf("\nPlease choose how many cards this deck will have (1-52) and then hit the return key (Enter)\n");
+        printf("\nPlease choose how many cards this deck will have and then hit the return key (Enter)\n");
         printf("Number: ");
         checkInput = scanf(" %hu", &inputNumber);   // Get input number
         // If valid then exit loop
