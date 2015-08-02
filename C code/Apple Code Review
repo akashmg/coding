@@ -1,0 +1,35 @@
+1. Give description of function.
+2. Comment code lines that explain process and purpose.
+char *GetErrorString( int x )
+{
+    char errorString[20];
+
+3. Handle all cases in switch case including default.
+    switch ( x )
+    {
+        case 0:
+            errorString = "Success -- No error.";
+4. Check size of string assigned to array. Need additional element for null character to indicate end of string.
+            break;
+        case 2:
+            errorString = "Overflow!";
+            break;
+    }
+
+    errorString[19] = 0;
+8. Prefer to use NULL instead of 0 to clarify intent. But not an important change.
+
+    return errorString;
+}
+
+void main( void )
+{
+    int err = DoSomething();
+    if ( err )
+6. Use bool instead of int for err. If using int then compare with expected integer value.
+7. Code has unnecessary statements. If err == 0 then GetErrorString will not be called. Consider alternate implementation. 
+    {
+        printf( "%s\n", GetErrorString( err ) );
+5. Avoid function calls inside function calls. printf(x, f()). This can result in side-effects.
+    }
+}
