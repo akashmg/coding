@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdbool.h>
 #include "Calculations.h"
 
@@ -24,6 +23,7 @@ static void progIntro(void);
 static uint16_t getUserInput(void);
 static void retryInput(void);
 
+/********** MAIN FUNCTION *********/
 int main(int argc, char *argv[])
 {
     uint16_t numCards;
@@ -49,7 +49,10 @@ int main(int argc, char *argv[])
 
 
 
-/********* PRIVATE FUNCTIONS ***********/ 
+/********* PRIVATE FUNCTIONS ***********/
+/**
+ * This function prints a short description of the program.
+ */
 static void progIntro(void)
 {
     printf("Hello! This program computes the number of iterations needed to get back to square one!\n");
@@ -61,6 +64,10 @@ static void progIntro(void)
 
 }
 
+/**
+ * [getUserInput This function gets the user input]
+ * @return  [Unsigned integer entered by user.]
+ */
 static uint16_t getUserInput(void)
 {
     uint16_t checkInput;           // check result of scanf
@@ -103,6 +110,10 @@ static uint16_t getUserInput(void)
     return inputNumber;
 }
 
+/**
+ * retryInput This function prompts the user to retry, gets feedback and proceeds accordingly.
+ *             If the user input is incorrect, then it exits with a fault.
+ */
 static void retryInput(void)
 {
     char     repeatDecision;       // record user's decision to try again
