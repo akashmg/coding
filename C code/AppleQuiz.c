@@ -59,13 +59,14 @@ int main(int argc, char *argv[])
  */
 static void progIntro(void)
 {
-    printf("Hello! This program computes the number of iterations needed to get back to square one!\n");
+    printf("Hello! This program computes the number of iterations needed to get back to square one!\n\n");
     printf("Given a deck of cards, a special shuffling pattern is implemented - the top card is alternated between,"
             "first, being put on a table (assuming you are sitting at a table) and, second, placed at the bottom of the deck.\n");
-    printf("Once all cards are on the table, the same process is repeated until the original sequence of cards is returned.\n");
+    printf("Once all cards are on the table, the same process is repeated until the original sequence of cards is returned.\n\n");
     printf("The goal of this code is to count the number of repetitions needed to complete this cycle.\n");
     printf("The user gets to input the number of cards present in the deck.\n");
     printf("The first 5 characters of your input will be accepted and an integer will be extracted upto a valid character.\n");
+    printf("Numbers larger than 32767 are treated as negative integers.\n");
     printf("If the computation takes longer than 1 minute then I will quit.\n");
 
 }
@@ -152,7 +153,7 @@ static void retryInput(void)
     char     repeatDecision;       // record user's decision to try again
 
     printf("Try again? (y/n): ");
-    scanf("%1c", &repeatDecision);
+    scanf("%1c", &repeatDecision);  // Read input (only 1st character)
     if (getchar() != '\n')
     {
         printf("Only the first input character is read.\n");
