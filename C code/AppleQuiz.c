@@ -39,7 +39,10 @@ int main(int argc, char *argv[])
         // Calculate values
         result = calcNumIterations(numCards);
         // Print result
-        printf("%hu iterations are needed to return to starting pattern.\n", result);
+        if (result > 0U)
+        {  
+            printf("%hu iterations are needed to return to starting pattern.\n", result);
+        }
         // Check if user wants to try again
         retryInput();
     }
@@ -61,7 +64,8 @@ static void progIntro(void)
     printf("Once all cards are on the table, the same process is repeated until the original sequence of cards is returned.\n");
     printf("The goal of this code is to count the number of repetitions needed to complete this cycle.\n");
     printf("The user gets to input the number of cards present in the deck.\n");
-    printf("It is advisable to limit the number to less than 1000 to ensure a reasonable processing time.");
+    printf("The input cannot exceed 32767. The processing time for larger numbers can be extrememly long.\n");
+    printf("If the computation takes longer than 1 minute then I will quit.\n");
 
 }
 
@@ -72,7 +76,7 @@ static void progIntro(void)
 static uint16_t getUserInput(void)
 {
     uint16_t checkInput;           // check result of scanf
-    uint16_t inputNumber;          // Number cannot be larger than 5 digits
+    int16_t inputNumber;           // input number
     bool     inputSuccess = false; // Poll user until we get a successful input
     uint16_t exitCounter = 3U;     // count down to zero how many input errors user has made.
 
@@ -82,9 +86,9 @@ static uint16_t getUserInput(void)
         // Prompt user for input
         printf("\nPlease choose how many cards this deck will have and then hit the return key (Enter)\n");
         printf("Number: ");
-        checkInput = scanf(" %hu", &inputNumber);   // Get input number
+        checkInput = scanf(" %hd", &inputNumber);   // Get input number
         // If valid then exit loop
-        if (checkInput == 1U)
+        if ((checkInput == 1U)&&(inputNumber > 0))
         {
             inputSuccess = true;
             printf("Calculating...\n");
@@ -98,8 +102,20 @@ static uint16_t getUserInput(void)
                 exit(EXIT_RETRY_ERROR);
             }
 
-            // Inform user of input error and offer to try again.
-            printf("Incorrect input. Please enter numeric values only!\n");
+            if (inputNumber < 0)
+            {
+                printf("Enter a valid number please!\n");
+            }
+            else if (inputNumber == 0)
+            {
+                printf("Nice try! I'm not falling for it.\n");
+            }
+            else
+            {
+                // Inform user of input error and offer to try again.
+                printf("Incorrect input. Please enter numeric values only!\n");
+            }
+
             // Check if user would like to retry
             retryInput();
 
@@ -108,7 +124,7 @@ static uint16_t getUserInput(void)
     }
 
     // if valid input, then return
-    return inputNumber;
+    return (uint16_t)inputNumber;
 }
 
 /**

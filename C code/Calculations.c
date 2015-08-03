@@ -10,10 +10,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 /********* D E F I N E S ***********/ 
  #define TURN_TABLE_DECK_OVER_FOR_RESHUFFLE 0   // Set to 1 if you turn the deck over when you pick it up from the table.
  #define START_CARDS_SHUFFLE_IN_REVERSE     0   // Set to 1 if the card order should be reversed for first shuffle
+ #define TIMEOUT_SEC                        60.0// 60 seconds timeout
 
 /********* T Y P E D E F S ***********/ 
 // This is the linked list structure for each element.
@@ -43,6 +45,7 @@ static bool compareOriginal(void);
 static CardList_S * cardPop(void);
 static void cardPopAndAppend(void);
 static void deleteCardList(CardList_S * listHead);
+static bool timeOut(clock_t start);
 
 /********* PUBLIC FUNCTIONS ***********/ 
 uint16_t calcNumIterations(uint16_t numCards)
@@ -124,6 +127,7 @@ static void beginCalculation(void)
 {
     bool backToSquareOne = false;
     uint16_t loopCounter = 0U;
+    clock_t start = clock();
     // Loop while the original pattern is not achieved
     while (!backToSquareOne)
     {
@@ -134,7 +138,12 @@ static void beginCalculation(void)
         {
             backToSquareOne = true;
         }
-
+        // If timed out then quit
+        if (timeOut(start))
+        {
+            loopCounter = 0U;
+            break;
+        }
     }
 
     CalculationVars.result = loopCounter;   // Update the result
@@ -250,4 +259,24 @@ static void deleteCardList(CardList_S * listHead)
         head = head->next;
         free(temp);
     }
+}
+
+/**
+ * This function computes the time taken by the calculation loop. 
+ * If it exceeds the timeout period then the calculation quits.
+ * @param  start [clock_t value for start of the loop]
+ * @return       [time out status - true if timed out]
+ */
+static bool timeOut(clock_t start)
+{
+    bool timedOut = false;
+    clock_t current = clock();
+    double timeElapsed = (double)((current - start)/CLOCKS_PER_SEC);
+    if (timeElapsed > TIMEOUT_SEC)
+    {
+        printf("This is taking too long, I'm outta here! Try a reasonable number or run this on a supercomputer!\n");
+        timedOut = true;
+    }
+
+    return timedOut;
 }
