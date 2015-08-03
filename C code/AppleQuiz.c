@@ -10,13 +10,14 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 #include "Calculations.h"
 
 /********* D E F I N E S ***********/ 
 #define EXIT_SUCCESS     0
 #define EXIT_INPUT_ERROR 1
 #define EXIT_RETRY_ERROR 2
-
+#define MAX_INTEGER_DIGITS 5
 
 /********* PRIVATE FUNCTION DEFINITIONS ***********/ 
 static void progIntro(void);
@@ -64,7 +65,7 @@ static void progIntro(void)
     printf("Once all cards are on the table, the same process is repeated until the original sequence of cards is returned.\n");
     printf("The goal of this code is to count the number of repetitions needed to complete this cycle.\n");
     printf("The user gets to input the number of cards present in the deck.\n");
-    printf("The input cannot exceed 32767. The processing time for larger numbers can be extrememly long.\n");
+    printf("The first 5 characters of your input will be accepted and an integer will be extracted upto a valid character.\n");
     printf("If the computation takes longer than 1 minute then I will quit.\n");
 
 }
@@ -75,7 +76,8 @@ static void progIntro(void)
  */
 static uint16_t getUserInput(void)
 {
-    uint16_t checkInput;           // check result of scanf
+    uint16_t checkInput;           // check result of fgets
+    char     inputString[(MAX_INTEGER_DIGITS + 1)];    
     int16_t inputNumber;           // input number
     bool     inputSuccess = false; // Poll user until we get a successful input
     uint16_t exitCounter = 3U;     // count down to zero how many input errors user has made.
@@ -86,12 +88,27 @@ static uint16_t getUserInput(void)
         // Prompt user for input
         printf("\nPlease choose how many cards this deck will have and then hit the return key (Enter)\n");
         printf("Number: ");
-        checkInput = scanf(" %hd", &inputNumber);   // Get input number
+        checkInput = (fgets(inputString, (MAX_INTEGER_DIGITS + 1), stdin) != NULL); // Get input number
+
+        if (checkInput && (inputString[0] != '\n'))
+        {
+            // if user input is longer than what we expect
+            if (inputString[strlen(inputString)-1] != '\n')
+            {
+                while(getchar() != '\n');       // Get all overflow characters
+            }
+            inputNumber = atoi(inputString);
+        }
+        else
+        {
+            printf("No input was received!\n");
+            continue;
+        }
         // If valid then exit loop
-        if ((checkInput == 1U)&&(inputNumber > 0))
+        if (inputNumber > 0)
         {
             inputSuccess = true;
-            printf("Calculating...\n");
+            printf("Calculating for %d cards...\n", inputNumber);
         }
         else    // Retry implementation
         {
@@ -102,18 +119,17 @@ static uint16_t getUserInput(void)
                 exit(EXIT_RETRY_ERROR);
             }
 
-            if (inputNumber < 0)
+            if (inputNumber == 0)
             {
-                printf("Enter a valid number please!\n");
+                printf("I'm not falling for that! Please enter a positive integer.\n");
             }
-            else if (inputNumber == 0)
+            else if (inputNumber < 0)
             {
-                printf("Nice try! I'm not falling for it.\n");
+                printf("Positive integers only!\n");
             }
             else
             {
-                // Inform user of input error and offer to try again.
-                printf("Incorrect input. Please enter numeric values only!\n");
+                printf("Invalid input!\n");
             }
 
             // Check if user would like to retry
@@ -136,7 +152,12 @@ static void retryInput(void)
     char     repeatDecision;       // record user's decision to try again
 
     printf("Try again? (y/n): ");
-    scanf("%*c %c", &repeatDecision);
+    scanf("%1c", &repeatDecision);
+    if (getchar() != '\n')
+    {
+        printf("Only the first input character is read.\n");
+        while (getchar() != '\n');
+    }
 
     // User chose to quit
     if ((repeatDecision == 'n') || (repeatDecision == 'N'))
